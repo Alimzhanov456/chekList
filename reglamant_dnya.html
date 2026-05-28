@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Регламент дня · Менеджер по продажам</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b0c0e;
+  --surface: #13141a;
+  --surface2: #1a1b23;
+  --surface3: #21222c;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #eeeef0;
+  --muted: #5a5a6a;
+  --muted2: #8888a0;
+  --green: #22c98e;
+  --green-dim: rgba(34,201,142,0.1);
+  --green-glow: rgba(34,201,142,0.2);
+  --orange: #fb923c;
+  --orange-dim: rgba(251,146,60,0.1);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.1);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,0.1);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,0.1);
+  --yellow: #fbbf24;
+  --yellow-dim: rgba(251,191,36,0.1);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Geologica', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── TOP HEADER ── */
+.top-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+
+.top-header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.top-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pulse-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green-glow);
+  animation: pulse 2.5s infinite;
+}
+@keyframes pulse {
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.5;transform:scale(.8)}
+}
+
+.top-badge {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+
+.top-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.kpi-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kpi-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 50px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kpi-chip .kpi-icon { font-size: 13px; }
+.kpi-chip .kpi-val { color: var(--green); font-family: 'JetBrains Mono', monospace; }
+.kpi-chip .kpi-label { color: var(--muted2); font-weight: 400; }
+
+/* ── PROGRESS ── */
+.prog-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.prog-track {
+  flex: 1;
+  height: 3px;
+  background: var(--surface3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 99px;
+  transition: width .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 0 8px var(--green-glow);
+  width: 0%;
+}
+.prog-label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.prog-label span { color: var(--green); font-weight: 600; }
+
+/* ── LAYOUT ── */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 28px 24px 0;
+}
+
+/* ── BLOCK HEADER ── */
+.block {
+  margin-bottom: 28px;
+}
+
+.block-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.block-head.morning { background: rgba(251,146,60,.07); border-color: rgba(251,146,60,.2); }
+.block-head.afternoon { background: rgba(96,165,250,.07); border-color: rgba(96,165,250,.2); }
+.block-head.sp { background: rgba(167,139,250,.07); border-color: rgba(167,139,250,.2); }
+.block-head.result { background: rgba(34,201,142,.07); border-color: rgba(34,201,142,.2); }
+
+.block-icon {
+  font-size: 22px;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.morning .block-icon { background: rgba(251,146,60,.15); }
+.afternoon .block-icon { background: rgba(96,165,250,.15); }
+.sp .block-icon { background: rgba(167,139,250,.15); }
+.result .block-icon { background: rgba(34,201,142,.15); }
+
+.block-meta { flex: 1; }
+.block-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.morning .block-title { color: var(--orange); }
+.afternoon .block-title { color: var(--blue); }
+.sp .block-title { color: var(--purple); }
+.result .block-title { color: var(--green); }
+
+.block-sub {
+  font-size: 12px;
+  color: var(--muted2);
+  margin-top: 3px;
+  font-weight: 400;
+}
+
+.block-kpi {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mini-kpi {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 50px;
+  background: var(--surface2);
+  color: var(--muted2);
+  border: 1px solid var(--border);
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+/* ── ITEM ── */
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .15s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.item:last-child { border-bottom: none; }
+.item:hover { background: var(--surface2); }
+.item.done { background: rgba(34,201,142,.04); }
+.item.done:hover { background: rgba(34,201,142,.07); }
+
+/* sub-items */
+.sub-items { padding: 0 16px 10px 52px; display: none; }
+.item.open + .sub-items { display: block; }
+.sub-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.sub-item:last-child { border-bottom: none; }
+.sub-item:hover .sub-check { border-color: var(--border2); }
+
+.sub-check {
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border2);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.sub-item.done .sub-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.sub-check svg {
+  width: 11px; height: 11px;
+  stroke: #fff; stroke-width: 2.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transform: scale(.5);
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.sub-item.done .sub-check svg { opacity: 1; transform: scale(1); }
+
+.sub-text { font-size: 12.5px; color: var(--muted2); line-height: 1.5; }
+.sub-item.done .sub-text { text-decoration: line-through; color: var(--muted); opacity: .6; }
+
+/* expand arrow */
+.item-arrow {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--muted);
+  transition: transform .2s;
+}
+.item.open .item-arrow { transform: rotate(90deg); }
+
+/* number */
+.item-num {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  color: var(--muted2);
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all .2s;
+}
+.item.done .item-num {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.item-body { flex: 1; min-width: 0; }
+.item-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  transition: color .2s, opacity .2s;
+}
+.item.done .item-title {
+  color: var(--muted2);
+  text-decoration: line-through;
+  text-decoration-color: rgba(34,201,142,.4);
+  opacity: .6;
+}
+.item-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.45;
+}
+.item.done .item-hint { opacity: .4; }
+
+.item-badge {
+  font-size: 10px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 3px 9px;
+  border-radius: 50px;
+  flex-shrink: 0;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  margin-top: 1px;
+}
+.badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,201,142,.25); }
+.badge-orange { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(251,146,60,.25); }
+.badge-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(96,165,250,.25); }
+.badge-purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,.25); }
+.badge-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,.25); }
+.badge-yellow { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(251,191,36,.25); }
+
+.item-check {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border2);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+  margin-top: 1px;
+}
+.item.done .item-check {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green-glow);
+}
+.item-check svg {
+  width: 13px; height: 13px;
+  stroke: #fff; stroke-width: 2.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transform: scale(.5);
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.item.done .item-check svg { opacity: 1; transform: scale(1); }
+
+/* ── SECTION DIVIDER ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 14px;
+}
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── SP MONITOR TABLE ── */
+.sp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.sp-card:hover { background: var(--surface2); border-color: var(--border2); }
+.sp-card.done {
+  background: var(--green-dim);
+  border-color: rgba(34,201,142,.25);
+}
+
+.sp-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.sp-card-icon { font-size: 18px; }
+.sp-card-check {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.sp-card.done .sp-card-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.sp-card-check svg {
+  width: 11px; height: 11px;
+  stroke: #fff; stroke-width: 2.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transform: scale(.5);
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.sp-card.done .sp-card-check svg { opacity: 1; transform: scale(1); }
+
+.sp-card-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.sp-card.done .sp-card-title { color: var(--muted2); opacity: .7; }
+.sp-card-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+/* ── STATS MONITOR ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.stat-val {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.35;
+}
+
+/* ── RESULT BANNER ── */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.result-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.result-chip-icon { font-size: 20px; }
+.result-chip-val {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--green);
+  line-height: 1;
+}
+.result-chip-label {
+  font-size: 11px;
+  color: var(--muted2);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+/* ── DONE BANNER ── */
+.done-banner {
+  display: none;
+  text-align: center;
+  padding: 28px 20px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34,201,142,.2);
+  border-radius: 12px;
+  margin-top: 8px;
+  animation: fadeUp .4s ease;
+}
+.done-banner.visible { display: block; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(8px) }
+  to { opacity:1; transform:translateY(0) }
+}
+.done-banner h2 { font-size: 16px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.done-banner p { font-size: 13px; color: var(--muted2); line-height: 1.5; }
+
+/* ── FOOTER ── */
+.footer {
+  max-width: 800px;
+  margin: 32px auto 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer-note { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+/* reset btn */
+.reset-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  font-family: 'Geologica', sans-serif;
+  font-size: 12px; font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.reset-btn:hover { border-color: var(--border2); color: var(--text); background: var(--surface); }
+.reset-btn svg { width: 12px; height: 12px; }
+
+@media(max-width:540px){
+  .top-header { padding: 16px 16px 14px; }
+  .content { padding: 20px 16px 0; }
+  .sp-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(3,1fr); }
+  .result-grid { grid-template-columns: 1fr; }
+  .top-title { font-size: 17px; }
+  .kpi-chip { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<header class="top-header">
+  <div class="top-header-inner">
+    <div class="top-meta">
+      <div class="pulse-dot"></div>
+      <span class="top-badge">Менеджер · Регламент дня</span>
+    </div>
+    <div class="top-title">Рабочий день — Битрикс 24</div>
+    <div class="kpi-strip">
+      <div class="kpi-chip"><span class="kpi-icon">📞</span><span class="kpi-val">12</span><span class="kpi-label">звонков от 1 мин</span></div>
+      <div class="kpi-chip"><span class="kpi-icon">🤝</span><span class="kpi-val">4</span><span class="kpi-label">встречи назначены</span></div>
+      <div class="kpi-chip"><span class="kpi-icon">💰</span><span class="kpi-val">1</span><span class="kpi-label">сделка</span></div>
+      <div class="kpi-chip"><span class="kpi-icon">📋</span><span class="kpi-val">25</span><span class="kpi-label">наборов</span></div>
+    </div>
+    <div class="prog-bar-wrap">
+      <div class="prog-track"><div class="prog-fill" id="prog"></div></div>
+      <div class="prog-label"><span id="prog-done">0</span>/<span id="prog-total">0</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+
+<!-- ══ УТРО ══ -->
+<div class="block">
+  <div class="block-head morning">
+    <div class="block-icon">🌅</div>
+    <div class="block-meta">
+      <div class="block-title">До обеда — Встречи и звонки</div>
+      <div class="block-sub">Фокус на активных действиях: обзвон, подтверждения, воронка</div>
+    </div>
+    <div class="block-kpi">
+      <div class="mini-kpi">3 встречи</div>
+      <div class="mini-kpi">6 зв. &gt;1 мин</div>
+      <div class="mini-kpi">25 наборов</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">01</div>
+      <div class="item-body">
+        <div class="item-title">Составить план на день</div>
+        <div class="item-hint">В пути на работу или до окончания предыдущего рабочего дня</div>
+      </div>
+      <span class="item-badge badge-orange">СТАРТ</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">02</div>
+      <div class="item-body">
+        <div class="item-title">Подтверждение встреч</div>
+        <div class="item-hint">Позвонить клиентам и подтвердить все встречи на сегодня. Если не берут — написать СМС</div>
+      </div>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">03</div>
+      <div class="item-body">
+        <div class="item-title">Проверить «Ожидания» — главные клиенты</div>
+        <div class="item-hint">Проверить на оплату, договор, высланные счета — 10 мин. Вкладка по всем важным клиентам</div>
+      </div>
+      <span class="item-badge badge-yellow">10 мин</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleExpand(this)">
+      <div class="item-num">04</div>
+      <div class="item-body">
+        <div class="item-title">Обзвон новых клиентов</div>
+        <div class="item-hint">Перед набором — прочитать инфо о компании в интернете. 30 мин</div>
+      </div>
+      <span class="item-badge badge-blue">30 мин</span>
+      <svg class="item-arrow" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+    <div class="sub-items">
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Прочитать инфо о компании в интернете перед набором (см. инструкцию)</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Обзвон минимум 1 раз</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">В случае НДЗ — 1 СМС в WhatsApp</div>
+      </div>
+    </div>
+
+    <div class="item" onclick="toggleExpand(this)">
+      <div class="item-num">05</div>
+      <div class="item-body">
+        <div class="item-title">Обзвон клиентов «Первый контакт»</div>
+        <div class="item-hint">30 мин</div>
+      </div>
+      <span class="item-badge badge-blue">30 мин</span>
+      <svg class="item-arrow" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+    <div class="sub-items">
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Обзвон минимум 1 раз</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">В случае НДЗ — 1 СМС в WhatsApp</div>
+      </div>
+    </div>
+
+    <div class="item" onclick="toggleExpand(this)">
+      <div class="item-num">06</div>
+      <div class="item-body">
+        <div class="item-title">Работа по своим делам</div>
+        <div class="item-hint">45 мин — 1 час. Завершить все дела до обеда</div>
+      </div>
+      <span class="item-badge badge-orange">45–60 мин</span>
+      <svg class="item-arrow" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+    <div class="sub-items">
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Просмотреть заявки без дел — если не на этапе НДЗ, добавить дело. Таких клиентов вообще не должно быть</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Завершить все дела до обеда</div>
+      </div>
+    </div>
+
+    <div class="item" onclick="toggleExpand(this)">
+      <div class="item-num">07</div>
+      <div class="item-body">
+        <div class="item-title">Анализ клиентов по воронке</div>
+        <div class="item-hint">Вытащить встречи с нужных этапов, проверить стадии</div>
+      </div>
+      <span class="item-badge badge-purple">Воронка</span>
+      <svg class="item-arrow" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+    <div class="sub-items">
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Встреча назначена» — точно ли все, с кем встреча назначена? Нет ли тех, с кем она не была проведена? Если есть — переназначить или сдвинуть на правильный этап</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Подготовка презентации» — почему там застряли? Прозвонить, написать</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Выявление потребности» — почему там застряли? Прозвонить, написать</div>
+      </div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">08</div>
+      <div class="item-body">
+        <div class="item-title">Проверить все чаты — должны быть завершены</div>
+        <div class="item-hint">Открыть вкладку активных чатов, завершить все открытые</div>
+      </div>
+      <span class="item-badge badge-red">Обязательно</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ПОСЛЕ ОБЕДА ══ -->
+<div class="block">
+  <div class="block-head afternoon">
+    <div class="block-icon">☀️</div>
+    <div class="block-meta">
+      <div class="block-title">После обеда — Генерация денег</div>
+      <div class="block-sub">Фокус на ожиданиях, дожиме, KП и закрытии сделок</div>
+    </div>
+    <div class="block-kpi">
+      <div class="mini-kpi">+6 зв. &gt;1 мин</div>
+      <div class="mini-kpi">2 встречи</div>
+      <div class="mini-kpi">2 КП</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">09</div>
+      <div class="item-body">
+        <div class="item-title">2-й обзвон новых клиентов</div>
+        <div class="item-hint">15 минут</div>
+      </div>
+      <span class="item-badge badge-blue">15 мин</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">10</div>
+      <div class="item-body">
+        <div class="item-title">2-й обзвон клиентов «Первый контакт»</div>
+        <div class="item-hint">20 минут</div>
+      </div>
+      <span class="item-badge badge-blue">20 мин</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">11</div>
+      <div class="item-body">
+        <div class="item-title">БП «Ожидания» — пушить главных клиентов</div>
+        <div class="item-hint">Дожимать по оплате и договорам</div>
+      </div>
+      <span class="item-badge badge-yellow">💰 Деньги</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleExpand(this)">
+      <div class="item-num">12</div>
+      <div class="item-body">
+        <div class="item-title">Работа с воронкой — генерация денег</div>
+        <div class="item-hint">Пройтись по всем денежным этапам</div>
+      </div>
+      <span class="item-badge badge-green">Воронка</span>
+      <svg class="item-arrow" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+    <div class="sub-items">
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Встреча проведена» — провести допродажу, если цены обозначены. Назначить доп. встречу, если цены не озвучены</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Проведена презентация» — что с ними делать? Как продвинуть к договору? При необходимости запросить ОС у РОП или БА</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Договор на подписи» — как привести к счёту на оплату?</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">«Счёт в оплате» — у всех ли выставлены счета? Все ли документы прикреплены? Карточка компании заполнена? Дело на Ильдара поставлено? Проект начат?</div>
+      </div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">13</div>
+      <div class="item-body">
+        <div class="item-title">3-й обзвон новых клиентов + «Первый контакт»</div>
+        <div class="item-hint">Можно через WhatsApp</div>
+      </div>
+      <span class="item-badge badge-blue">через ВА</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">14</div>
+      <div class="item-body">
+        <div class="item-title">Сделать и выслать все КП</div>
+        <div class="item-hint">Прикрепить к сделкам в CRM</div>
+      </div>
+      <span class="item-badge badge-green">2 КП</span>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">15</div>
+      <div class="item-body">
+        <div class="item-title">Отправка отчёта в группу</div>
+        <div class="item-hint">Итоги дня — в общий чат отдела продаж</div>
+      </div>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleExpand(this)">
+      <div class="item-num">16</div>
+      <div class="item-body">
+        <div class="item-title">Анализ проделанной работы</div>
+        <div class="item-hint">10 минут. Если хоть один KPI не выполнен — прописать причину и решение</div>
+      </div>
+      <span class="item-badge badge-orange">10 мин</span>
+      <svg class="item-arrow" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+    <div class="sub-items">
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Выписать и проанализировать что было сделано хорошо</div>
+      </div>
+      <div class="sub-item" onclick="toggleSub(this)">
+        <div class="sub-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+        <div class="sub-text">Если KPI не выполнен — прописать почему и как это решить завтра</div>
+      </div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">17</div>
+      <div class="item-body">
+        <div class="item-title">Привести в порядок рабочее место</div>
+        <div class="item-hint">Перед уходом — чтобы не тратить время утром</div>
+      </div>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+
+    <div class="item" onclick="toggleItem(this)">
+      <div class="item-num">18</div>
+      <div class="item-body">
+        <div class="item-title">Завести будильник перед сном</div>
+        <div class="item-hint">Чтобы начать день вовремя и в ресурсе</div>
+      </div>
+      <div class="item-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ СП МОНИТОРИНГ ══ -->
+<div class="block">
+  <div class="block-head sp">
+    <div class="block-icon">🔍</div>
+    <div class="block-meta">
+      <div class="block-title">СП «Для отдела продаж» — мониторинг в течение дня</div>
+      <div class="block-sub">Проверять регулярно — утром, в обед и перед уходом</div>
+    </div>
+  </div>
+
+  <div class="sp-grid">
+    <div class="sp-card" onclick="toggleSP(this)">
+      <div class="sp-card-top">
+        <div class="sp-card-icon">💬</div>
+        <div class="sp-card-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+      </div>
+      <div class="sp-card-title">Активные чаты</div>
+      <div class="sp-card-hint">Все чаты должны быть завершены. Ни одного открытого</div>
+    </div>
+    <div class="sp-card" onclick="toggleSP(this)">
+      <div class="sp-card-top">
+        <div class="sp-card-icon">⏳</div>
+        <div class="sp-card-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+      </div>
+      <div class="sp-card-title">Ожидание денег</div>
+      <div class="sp-card-hint">Все ожидания обновлены. Нет просроченных и сегодняшних дат</div>
+    </div>
+    <div class="sp-card" onclick="toggleSP(this)">
+      <div class="sp-card-top">
+        <div class="sp-card-icon">📭</div>
+        <div class="sp-card-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+      </div>
+      <div class="sp-card-title">Сделки без дел</div>
+      <div class="sp-card-hint">Не должно быть ничего. Каждая сделка обязана иметь дело</div>
+    </div>
+    <div class="sp-card" onclick="toggleSP(this)">
+      <div class="sp-card-top">
+        <div class="sp-card-icon">🧊</div>
+        <div class="sp-card-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+      </div>
+      <div class="sp-card-title">Зависшие сделки</div>
+      <div class="sp-card-hint">Не должно быть ничего. Все сделки активно движутся</div>
+    </div>
+    <div class="sp-card" onclick="toggleSP(this)" style="grid-column: 1 / -1;">
+      <div class="sp-card-top">
+        <div class="sp-card-icon">📅</div>
+        <div class="sp-card-check"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3"/></svg></div>
+      </div>
+      <div class="sp-card-title">Встречи с клиентами</div>
+      <div class="sp-card-hint">Не должно быть встреч, запланированных на сегодня или прошедшие даты — всё должно быть проведено и закрыто</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ДЕТАЛИЗАЦИЯ ЗВОНКОВ ══ -->
+<div class="block">
+  <div class="block-head result">
+    <div class="block-icon">📊</div>
+    <div class="block-meta">
+      <div class="block-title">Детализация звонков — проверять ежедневно</div>
+      <div class="block-sub">Открыть детализацию в Битрикс 24 и сверить показатели</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-val" id="calls-val">0</div>
+      <div class="stat-label">Звонков<br>от 1 минуты</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="dials-val">0</div>
+      <div class="stat-label">Наборов<br>всего</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="meets-val">0</div>
+      <div class="stat-label">Встреч<br>назначено</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:12px; color:var(--muted2); font-weight:600; text-transform:uppercase; letter-spacing:.08em; font-family:'JetBrains Mono',monospace;">Ввести данные из детализации</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+        <div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:5px;">Звонков &gt;1 мин</div>
+          <input type="number" id="inp-calls" min="0" placeholder="0" oninput="updateStats()"
+            style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:5px;">Наборов</div>
+          <input type="number" id="inp-dials" min="0" placeholder="0" oninput="updateStats()"
+            style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:5px;">Встреч назначено</div>
+          <input type="number" id="inp-meets" min="0" placeholder="0" oninput="updateStats()"
+            style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;outline:none;">
+        </div>
+      </div>
+      <div id="kpi-status" style="display:none; padding:10px 14px; border-radius:8px; font-size:12.5px; font-weight:500; line-height:1.5;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ИТОГ ДНЯ ══ -->
+<div class="block">
+  <div class="block-head result">
+    <div class="block-icon">🏁</div>
+    <div class="block-meta">
+      <div class="block-title">Результат на конец дня</div>
+      <div class="block-sub">Все показатели должны быть достигнуты перед уходом</div>
+    </div>
+  </div>
+
+  <div class="result-grid">
+    <div class="result-chip">
+      <div class="result-chip-icon">📞</div>
+      <div><div class="result-chip-val">12</div><div class="result-chip-label">звонков от 1 мин</div></div>
+    </div>
+    <div class="result-chip">
+      <div class="result-chip-icon">🤝</div>
+      <div><div class="result-chip-val">4</div><div class="result-chip-label">встречи назначены</div></div>
+    </div>
+    <div class="result-chip">
+      <div class="result-chip-icon">👥</div>
+      <div><div class="result-chip-val">2</div><div class="result-chip-label">встречи проведены</div></div>
+    </div>
+    <div class="result-chip">
+      <div class="result-chip-icon">📄</div>
+      <div><div class="result-chip-val">2</div><div class="result-chip-label">отправленных КП</div></div>
+    </div>
+    <div class="result-chip">
+      <div class="result-chip-icon">💰</div>
+      <div><div class="result-chip-val">1</div><div class="result-chip-label">сделка закрыта</div></div>
+    </div>
+    <div class="result-chip">
+      <div class="result-chip-icon">✅</div>
+      <div><div class="result-chip-val">0</div><div class="result-chip-label">незавершённых дел</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="done-banner" id="done-banner">
+  <div style="font-size:36px;margin-bottom:12px;">🏆</div>
+  <h2>День выполнен по регламенту!</h2>
+  <p>Все пункты отмечены. Хорошая работа — можно идти домой с чистой совестью.</p>
+</div>
+
+</main>
+
+<footer class="footer">
+  <span class="footer-note">Регламент дня · Битрикс 24</span>
+  <button class="reset-btn" onclick="resetAll()">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1 0 1.5-3.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Сбросить всё
+  </button>
+</footer>
+
+<script>
+  let total = 0;
+
+  function countAll() {
+    return document.querySelectorAll('.item, .sp-card').length;
+  }
+
+  function countDone() {
+    return document.querySelectorAll('.item.done, .sp-card.done').length;
+  }
+
+  function updateProgress() {
+    const t = countAll();
+    const d = countDone();
+    document.getElementById('prog').style.width = (d / t * 100) + '%';
+    document.getElementById('prog-done').textContent = d;
+    document.getElementById('prog-total').textContent = t;
+    const banner = document.getElementById('done-banner');
+    if (d === t) {
+      banner.classList.add('visible');
+      banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      banner.classList.remove('visible');
+    }
+  }
+
+  function toggleItem(el) {
+    // close expand if was open
+    el.classList.remove('open');
+    el.classList.toggle('done');
+    updateProgress();
+  }
+
+  function toggleExpand(el) {
+    const wasDone = el.classList.contains('done');
+    if (!wasDone) {
+      el.classList.toggle('open');
+    } else {
+      el.classList.remove('done');
+      el.classList.remove('open');
+    }
+    updateProgress();
+  }
+
+  function toggleSub(el) {
+    el.classList.toggle('done');
+  }
+
+  function toggleSP(el) {
+    el.classList.toggle('done');
+    updateProgress();
+  }
+
+  function updateStats() {
+    const calls = parseInt(document.getElementById('inp-calls').value) || 0;
+    const dials = parseInt(document.getElementById('inp-dials').value) || 0;
+    const meets = parseInt(document.getElementById('inp-meets').value) || 0;
+
+    document.getElementById('calls-val').textContent = calls;
+    document.getElementById('dials-val').textContent = dials;
+    document.getElementById('meets-val').textContent = meets;
+
+    const issues = [];
+    if (calls < 12) issues.push('📞 Звонков от 1 мин: ' + calls + ' / 12');
+    if (dials < 25) issues.push('📲 Наборов: ' + dials + ' / 25');
+    if (meets < 4) issues.push('🤝 Встреч назначено: ' + meets + ' / 4');
+
+    const box = document.getElementById('kpi-status');
+    if (calls || dials || meets) {
+      box.style.display = 'block';
+      if (issues.length === 0) {
+        box.style.background = 'rgba(34,201,142,.1)';
+        box.style.color = '#22c98e';
+        box.style.border = '1px solid rgba(34,201,142,.25)';
+        box.innerHTML = '✅ Все KPI выполнены — отличный день!';
+      } else {
+        box.style.background = 'rgba(251,146,60,.08)';
+        box.style.color = '#fb923c';
+        box.style.border = '1px solid rgba(251,146,60,.2)';
+        box.innerHTML = '⚠️ Не выполнено:<br>' + issues.join('<br>');
+      }
+    } else {
+      box.style.display = 'none';
+    }
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.item.done, .item.open').forEach(el => el.classList.remove('done', 'open'));
+    document.querySelectorAll('.sp-card.done').forEach(el => el.classList.remove('done'));
+    document.querySelectorAll('.sub-item.done').forEach(el => el.classList.remove('done'));
+    ['inp-calls','inp-dials','inp-meets'].forEach(id => document.getElementById(id).value = '');
+    updateStats();
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
